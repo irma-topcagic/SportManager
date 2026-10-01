@@ -1,10 +1,11 @@
-name: CI / CD
+name: CI
 
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
 
@@ -99,24 +100,3 @@ jobs:
       - name: Run tests
         run: npm test
 
-# ─────────────────────────────────────────────────────────────────────────────
-  # Provjera deploymenta na Railway
-  # Railway automatski deployuje na push na main
-  # ─────────────────────────────────────────────────────────────────────────────
-  verify-deployment:
-    name: Verify Deployment
-    needs: [test-backend, test-frontend]
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
-    steps:
-      - name: Wait for Railway deploy
-        run: sleep 30
-
-      - name: Check frontend health
-        run: |
-          curl -f https://sportmanager-frontend-production.up.railway.app \
-            --max-time 30 \
-            --retry 3 \
-            --retry-delay 10 \
-            || echo "Frontend health check failed"
